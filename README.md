@@ -1,1 +1,0 @@
-# wexaAI-assesment-nikhil-namaji
