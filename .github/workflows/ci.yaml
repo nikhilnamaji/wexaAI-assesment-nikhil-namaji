@@ -1,6 +1,5 @@
 name: Build and Push Docker Image
 
-# Trigger workflow on push to main branch
 on:
   push:
     branches:
@@ -23,14 +22,19 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # Step 3: Build Docker image
+      # Step 3: Build Docker image with commit SHA tag
       - name: Build Docker image
         run: |
+          IMAGE_TAG=ghcr.io/${{ github.repository_owner }}/nextjs-app:${{ github.sha }}
           docker build \
-            -t ghcr.io/${{ github.repository_owner }}/nextjs-app:latest \
+            --build-arg NODE_ENV=production \
+            -t $IMAGE_TAG \
             ./nextjs-app
+          # Also tag as latest
+          docker tag $IMAGE_TAG ghcr.io/${{ github.repository_owner }}/nextjs-app:latest
 
-      # Step 4: Push Docker image to GHCR
+      # Step 4: Push Docker images to GHCR
       - name: Push Docker image
         run: |
+          docker push ghcr.io/${{ github.repository_owner }}/nextjs-app:${{ github.sha }}
           docker push ghcr.io/${{ github.repository_owner }}/nextjs-app:latest
