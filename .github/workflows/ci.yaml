@@ -25,9 +25,9 @@ jobs:
       # Step 3: Build Docker image
       - name: Build Docker image
         run: |
-          docker build -t ghcr.io/${{ github.repository_owner }}/nextjs-app:latest ./nextjs-app
+          docker build -t ghcr.io/nikhilnamaji/nextjs-app:latest ./nextjs-app
 
       # Step 4: Push Docker image
       - name: Push Docker image
         run: |
-          docker push ghcr.io/${{ github.repository_owner }}/nextjs-app:latest
+          docker push ghcr.io/nikhilnamaji/nextjs-app:latest
