@@ -1,29 +1,31 @@
-# Stage 1: Build
-FROM node:18-alpine AS builder
-
+# Stage 1: Build the app
+FROM node:20-alpine AS builder
 WORKDIR /app
 
-# Copy package.json & package-lock.json from nextjs-app folder
-COPY nextjs-app/package*.json ./
+# Copy package files from subfolder
+COPY nextjs-app/package.json nextjs-app/package-lock.json ./
 
-# Install dependencies (omit dev in production image)
-RUN npm install --omit=dev
+# Install dependencies
+RUN npm ci
 
-# Copy the rest of the app
-COPY nextjs-app/. .
+# Copy rest of the app
+COPY nextjs-app ./
 
-# Build the Next.js app
-RUN npx next build
+# Build Next.js
+RUN npm run build
 
-# Stage 2: Production
-FROM node:18-alpine AS runner
+# Stage 2: Production image
+FROM node:20-alpine AS runner
 WORKDIR /app
 
-# Copy build from builder
-COPY --from=builder /app /app
+# Copy only necessary files from builder
+COPY --from=builder /app/package.json /app/package-lock.json ./
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/public ./public
 
 # Expose port
 EXPOSE 3000
 
-# Start app
-CMD ["npx", "next", "start"]
+# Start Next.js
+CMD ["npm", "start"]
